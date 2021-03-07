@@ -1,0 +1,71 @@
+KB
+{
+  "$schema": "http://json-schema.org/schema",
+  "title": "Request Schema",
+  "description": "Schema of a request",
+  "examples": [
+    {
+      "replacements": {
+        ":name": { "required": true, "name": "CAT_NAME" }
+      },
+      "url": "https://myapi.net/api/v1/cat/:name",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "petTheCat": true
+      }
+    }
+  ],
+  "properties": {
+    "replacements": {
+      "description": "Describes the dynamic replacements available/required for this request",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of this replacement, which will be used to find it in the input or environment variables; defaults to the replacement string"
+          },
+          "required": {
+            "type": "boolean",
+            "default": true
+          },
+          "default": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "url": {
+      "description": "Where to send the request, including any query string and anchor.",
+      "type": "string",
+      "examples": [
+        "https://myapi.net/api/v1/cat/:name?query={{QUERY}}#{{ANCHOR}}"
+      ]
+    },
+    "method": {
+      "description": "The request method; can also be a replacement placeholder.",
+      "type": "string",
+      "examples": ["GET", "POST", "{{METHOD}}"]
+    },
+    "headers": {
+      "description": "The headers to send for this request. Note that additional auto-generated headers, such as Content-Length and Content-Type, may also be sent.",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "body": {
+      "description": "The body of this request, if applicable.",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "object"
+        }
+      ]
+    }
+  }
+}
