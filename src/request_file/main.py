@@ -40,7 +40,12 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("files", type=str, nargs="+")
     parser.add_argument(
-        "-r", dest="replacements", default=[], type=replacement, action="append"
+        "--replace",
+        "-r",
+        dest="replacements",
+        default=[],
+        type=replacement,
+        action="append",
     )
     parser.add_argument(
         "--format", "-f", dest="format", default=Format.DEFAULT, type=Format
