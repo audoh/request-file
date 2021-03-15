@@ -90,7 +90,11 @@ if __name__ == "__main__":
             )
 
             if args.format == Format.BODY:
-                print(res.text)
+                try:
+                    _json = res.json()
+                    print(json.dumps(_json, indent=2))
+                except ValueError:
+                    print(res.text)
 
             elif args.format == Format.REQUESTS_MOCK:
                 mock_args = {
@@ -121,5 +125,9 @@ if __name__ == "__main__":
                 print(f"Status: {res.status_code} {res.reason}")
                 for key, value in res.headers.items():
                     print(f"{key}: {value}")
-                print(f"Body:")
-                print(res.text)
+                print("Body:")
+                try:
+                    _json = res.json()
+                    print(json.dumps(_json, indent=2))
+                except ValueError:
+                    print(res.text)
