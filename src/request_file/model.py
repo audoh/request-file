@@ -69,7 +69,7 @@ class RequestFile(BaseModel):
 
     @staticmethod
     def _replace(val_in: Any, *, old: str, new: str) -> Any:
-        if isinstance(val_in, dict):
+        if isinstance(val_in, (dict, CaseInsensitiveDict)):
             val_out: Dict[str, Any] = {}
             for old_key, old_value in val_in.items():
                 new_key = old_key.replace(old, new)
