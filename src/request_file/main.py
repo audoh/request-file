@@ -1,16 +1,22 @@
 import argparse
+import atexit
 import json
 from argparse import ArgumentParser
 from base64 import b64encode
 from dataclasses import dataclass
 from enum import Enum
-from os import getenv
+from os import getenv, path
 from sys import argv, stderr
 from typing import Iterable, Tuple
 
 import requests
 
 from . import model
+
+try:
+    import readline
+except Exception:
+    readline = None
 
 
 class Format(str, Enum):
@@ -36,7 +42,26 @@ class Arguments(argparse.Namespace):
     print_curl: bool
 
 
+histfile = path.expanduser("~/.pyrequestfile-history")
+
+
+def init_history() -> None:
+    if hasattr(readline, "read_history_file"):
+        try:
+            readline.read_history_file(histfile)
+        except IOError:
+            pass
+        atexit.register(save_history, histfile)
+
+
+def save_history() -> None:
+    readline.set_history_length(1000)
+    readline.write_history_file(histfile)
+
+
 if __name__ == "__main__":
+    init_history()
+
     parser = ArgumentParser()
     parser.add_argument("files", type=str, nargs="+")
     parser.add_argument(
