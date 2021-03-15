@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, Optional, Type, Union
+from typing import Any, Dict, Mapping, MutableMapping, Optional, Sequence, Type
 from urllib.parse import urlencode
 
 from pydantic import BaseModel, Field, validator
@@ -47,9 +47,9 @@ class RequestFile(BaseModel):
     @validator("replacements", pre=True)
     @classmethod
     def prepare_replacements(cls: Type["RequestFile"], replacements: Any) -> Any:
-        if isinstance(replacements, dict):
+        if isinstance(replacements, MutableMapping):
             for key, replacement in replacements.items():
-                if not isinstance(replacement, dict):
+                if not isinstance(replacement, MutableMapping):
                     continue
                 if not replacement.get("name"):
                     replacement["name"] = key
@@ -69,14 +69,14 @@ class RequestFile(BaseModel):
 
     @staticmethod
     def _replace(val_in: Any, *, old: str, new: str) -> Any:
-        if isinstance(val_in, (dict, CaseInsensitiveDict)):
+        if isinstance(val_in, Mapping):
             val_out: Dict[str, Any] = {}
             for old_key, old_value in val_in.items():
                 new_key = old_key.replace(old, new)
                 new_value = RequestFile._replace(old_value, old=old, new=new)
                 val_out[new_key] = new_value
             return val_out
-        elif isinstance(val_in, list):
+        elif isinstance(val_in, Sequence):
             return [
                 RequestFile._replace(old_value, old=old, new=new)
                 for old_value in val_in
