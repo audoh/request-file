@@ -44,6 +44,8 @@ class RequestFile(BaseModel):
         None, alias="json", description="The JSON data of this request, if applicable."
     )
 
+    exports: Dict[str, Iterable[str]] = {}
+
     @validator("replacements", pre=True)
     @classmethod
     def prepare_replacements(cls: Type["RequestFile"], replacements: Any) -> Any:
@@ -97,9 +99,9 @@ class RequestFile(BaseModel):
                 "url": url,
                 "method": method,
                 "headers": headers,
-                "text": text,
-                "form_data": form_data,
-                "json": json,
+                "body_text": text,
+                "body_data": form_data,
+                "body_json": json,
             }
         )
 
