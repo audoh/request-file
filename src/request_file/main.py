@@ -51,7 +51,7 @@ def init_history() -> None:
             readline.read_history_file(histfile)
         except IOError:
             pass
-        atexit.register(save_history, histfile)
+        atexit.register(save_history)
 
 
 def save_history() -> None:
