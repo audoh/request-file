@@ -1,29 +1,21 @@
 import argparse
 import atexit
-import json
 from argparse import ArgumentParser
-from base64 import b64encode
 from dataclasses import dataclass
-from enum import Enum
 from os import getenv, path
 from sys import argv, stderr
-from typing import Iterable, Tuple
+from typing import Iterable, List, Optional, Tuple
 
 import requests
 
-from . import model
+from request_file import model
+from request_file.export import export, export_file
+from request_file.format import Format, format
 
 try:
     import readline
 except Exception:
     readline = None
-
-
-class Format(str, Enum):
-    BODY = "body"
-    VERBOSE = "verbose"
-    REQUESTS_MOCK = "requests-mock"
-    DEFAULT = BODY
 
 
 def replacement(input: str) -> Tuple[str, str]:
@@ -40,6 +32,8 @@ class Arguments(argparse.Namespace):
     format: Format
     dry_run: bool
     print_curl: bool
+    print_exports: bool
+    exports_files: List[str]
 
 
 histfile = path.expanduser("~/.pyrequestfile-history")
@@ -81,6 +75,14 @@ if __name__ == "__main__":
     parser.add_argument(
         "--dry-run", "-d", dest="dry_run", default=False, action="store_true"
     )
+    parser.add_argument(
+        "--print-exports",
+        "-p",
+        dest="print_exports",
+        default=False,
+        action="store_true",
+    )
+    parser.add_argument("--exports-file", "-e", dest="exports_files", nargs="*")
     args = Arguments(**vars(parser.parse_args(argv[1:])))
 
     replacements = {key: value for key, value in args.replacements}
@@ -113,46 +115,12 @@ if __name__ == "__main__":
             res = requests.request(
                 method=mdl.method, url=mdl.url, headers=mdl.headers, data=mdl.body
             )
+            for _str in format(res=res, mdl=mdl, format=args.format):
+                print(_str)
 
-            if args.format == Format.BODY:
-                try:
-                    _json = res.json()
-                    print(json.dumps(_json, indent=2))
-                except ValueError:
-                    print(res.text)
-
-            elif args.format == Format.REQUESTS_MOCK:
-                mock_args = {
-                    "method": mdl.method,
-                    "url": res.url,
-                    "status_code": res.status_code,
-                    "reason": res.reason,
-                    "request_headers": mdl.headers,
-                    "headers": dict(res.headers),
-                }
-                try:
-                    res_json = res.json()
-                except ValueError:
-                    content_type = res.headers.get("content-type", "text/plain").split(
-                        ";"
-                    )[0]
-                    if content_type.startswith("text/"):
-                        mock_args["text"] = res.text
-                    else:
-                        mock_args["content"] = str(
-                            b64encode(res.content), encoding="utf-8"
-                        )
-                else:
-                    mock_args["json"] = res_json
-                print(json.dumps(mock_args, indent=2))
-
-            elif args.format == Format.VERBOSE:
-                print(f"Status: {res.status_code} {res.reason}")
-                for key, value in res.headers.items():
-                    print(f"{key}: {value}")
-                print("Body:")
-                try:
-                    _json = res.json()
-                    print(json.dumps(_json, indent=2))
-                except ValueError:
-                    print(res.text)
+            if args.exports_files:
+                for file in args.exports_files:
+                    export_file(res=res, mdl=mdl, path=file)
+            if args.print_exports:
+                for _str in export(res=res, mdl=mdl):
+                    print(_str, file=stderr)

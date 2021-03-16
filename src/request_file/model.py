@@ -44,7 +44,9 @@ class RequestFile(BaseModel):
         None, alias="json", description="The JSON data of this request, if applicable."
     )
 
-    exports: Dict[str, Iterable[str]] = {}
+    exports: Dict[str, str] = Field(
+        {}, description="Path specs for variables to export from the response."
+    )
 
     @validator("replacements", pre=True)
     @classmethod
