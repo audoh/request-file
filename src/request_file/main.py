@@ -124,7 +124,7 @@ if __name__ == "__main__":
 
             if args.exports_files:
                 for file in args.exports_files:
-                    export_file(res=res, mdl=mdl, path=file)
+                    export_file(res=res, mdl=mdl, path=file, namespace=env_namespace)
             if args.print_exports:
-                for _str in export(res=res, mdl=mdl):
+                for _str in export(res=res, mdl=mdl, namespace=env_namespace):
                     print(_str, file=stderr)
