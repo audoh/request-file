@@ -56,6 +56,10 @@ def save_history() -> None:
 if __name__ == "__main__":
     init_history()
 
+    env_namespace = getenv("REQUESTFILE_NAMESPACE", "")
+    if env_namespace:
+        env_namespace += "_"
+
     parser = ArgumentParser()
     parser.add_argument("files", type=str, nargs="+")
     parser.add_argument(
@@ -92,7 +96,7 @@ if __name__ == "__main__":
         for key, _replacement in mdl.replacements.items():
             input_replacement = replacements.get(_replacement.name)
             if input_replacement is None:
-                input_replacement = getenv(_replacement.name)
+                input_replacement = getenv(f"{env_namespace}{_replacement.name}")
             if input_replacement is None and _replacement.default:
                 input_replacement = _replacement.default
             if input_replacement is None and _replacement.required:
