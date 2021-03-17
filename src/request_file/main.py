@@ -100,17 +100,22 @@ if __name__ == "__main__":
     for file in args.files:
         mdl = model.RequestFile.load(file)
         for key, _replacement in mdl.replacements.items():
+            # Use explicit argument first
             input_replacement = replacements.get(_replacement.name)
+            # Try to use environment var second
             if input_replacement is None:
                 input_replacement = getenv(f"{env_namespace}{_replacement.name}")
+            # Use default value third if specified but offer the ability to override it
             if input_replacement is None and _replacement.default:
                 input_replacement = input(
                     f"Enter a value for {_replacement.name} ({_replacement.default}): "
                 )
                 if not input_replacement:
                     input_replacement = _replacement.default
+            # If no default specified but the replacement is required, prompt for value
             if input_replacement is None and _replacement.required:
                 input_replacement = input(f"Enter a value for {_replacement.name}: ")
+            # If we still haven't got a replacement then leave as-is
             if input_replacement is None:
                 continue
             mdl = mdl.replace(old=key, new=input_replacement)
