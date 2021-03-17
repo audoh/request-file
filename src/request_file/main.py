@@ -87,8 +87,12 @@ if __name__ == "__main__":
         default=False,
         action="store_true",
     )
-    parser.add_argument("--output", "-o", dest="output_files", action="append")
-    parser.add_argument("--exports", "-e", dest="exports_files", action="append")
+    parser.add_argument(
+        "--output", "-o", dest="output_files", action="append", default=[]
+    )
+    parser.add_argument(
+        "--exports", "-e", dest="exports_files", action="append", default=[]
+    )
     args = Arguments(**vars(parser.parse_args(argv[1:])))
 
     replacements = {key: value for key, value in args.replacements}
@@ -100,7 +104,11 @@ if __name__ == "__main__":
             if input_replacement is None:
                 input_replacement = getenv(f"{env_namespace}{_replacement.name}")
             if input_replacement is None and _replacement.default:
-                input_replacement = _replacement.default
+                input_replacement = input(
+                    f"Enter a value for {_replacement.name} ({_replacement.default}): "
+                )
+                if not input_replacement:
+                    input_replacement = _replacement.default
             if input_replacement is None and _replacement.required:
                 input_replacement = input(f"Enter a value for {_replacement.name}: ")
             if input_replacement is None:
