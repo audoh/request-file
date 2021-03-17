@@ -111,7 +111,7 @@ if __name__ == "__main__":
                 f"-H '{key}: {value}" for key, value in mdl.headers.items()
             )
             print(
-                f"curl -L -X {mdl.method} {header_string} -d '{mdl.body}' {mdl.url}",
+                f"curl -X {mdl.method} {header_string} -d '{mdl.body}' -L {mdl.url}",
                 file=stderr,
             )
 
