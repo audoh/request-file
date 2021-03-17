@@ -3,8 +3,8 @@ import atexit
 from argparse import ArgumentParser
 from dataclasses import dataclass
 from os import getenv, path
-from sys import argv, stderr
-from typing import Iterable, List, Optional, Tuple
+from sys import argv
+from typing import Iterable, List, Tuple
 
 import requests
 
@@ -34,6 +34,7 @@ class Arguments(argparse.Namespace):
     print_curl: bool
     print_exports: bool
     exports_files: List[str]
+    output_files: List[str]
 
 
 histfile = path.expanduser("~/.pyrequestfile-history")
@@ -86,7 +87,8 @@ if __name__ == "__main__":
         default=False,
         action="store_true",
     )
-    parser.add_argument("--exports-file", "-e", dest="exports_files", nargs="*")
+    parser.add_argument("--output", "-o", dest="output_files", action="append")
+    parser.add_argument("--exports-file", "-e", dest="exports_files", action="append")
     args = Arguments(**vars(parser.parse_args(argv[1:])))
 
     replacements = {key: value for key, value in args.replacements}
@@ -100,25 +102,26 @@ if __name__ == "__main__":
             if input_replacement is None and _replacement.default:
                 input_replacement = _replacement.default
             if input_replacement is None and _replacement.required:
-                print(f"Enter a value for {_replacement.name}: ", file=stderr, end="")
-                input_replacement = input()
+                input_replacement = input(f"Enter a value for {_replacement.name}: ")
             if input_replacement is None:
                 continue
             mdl = mdl.replace(old=key, new=input_replacement)
 
         if args.print_curl:
+
             header_string = " ".join(
                 f"-H '{key}: {value}'" for key, value in mdl.headers.items()
             )
-            print(
-                f"curl -X {mdl.method} {header_string} -d '{mdl.body}' -L {mdl.url}",
-                file=stderr,
-            )
+            print(f"curl -X {mdl.method} {header_string} -d '{mdl.body}' -L {mdl.url}")
 
         if not args.dry_run:
             res = requests.request(
                 method=mdl.method, url=mdl.url, headers=mdl.headers, data=mdl.body
             )
+            for file in args.output_files:
+                with open(file, "w") as fp:
+                    for _str in format(res=res, mdl=mdl, format=args.format):
+                        print(_str, file=fp)
             for _str in format(res=res, mdl=mdl, format=args.format):
                 print(_str)
 
@@ -127,4 +130,4 @@ if __name__ == "__main__":
                     export_file(res=res, mdl=mdl, path=file, namespace=env_namespace)
             if args.print_exports:
                 for _str in export(res=res, mdl=mdl, namespace=env_namespace):
-                    print(_str, file=stderr)
+                    print(_str)
