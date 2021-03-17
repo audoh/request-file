@@ -108,7 +108,7 @@ if __name__ == "__main__":
 
         if args.print_curl:
             header_string = " ".join(
-                f"-H '{key}: {value}" for key, value in mdl.headers.items()
+                f"-H '{key}: {value}'" for key, value in mdl.headers.items()
             )
             print(
                 f"curl -X {mdl.method} {header_string} -d '{mdl.body}' -L {mdl.url}",
