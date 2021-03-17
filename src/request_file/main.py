@@ -88,7 +88,7 @@ if __name__ == "__main__":
         action="store_true",
     )
     parser.add_argument("--output", "-o", dest="output_files", action="append")
-    parser.add_argument("--exports-file", "-e", dest="exports_files", action="append")
+    parser.add_argument("--exports", "-e", dest="exports_files", action="append")
     args = Arguments(**vars(parser.parse_args(argv[1:])))
 
     replacements = {key: value for key, value in args.replacements}
