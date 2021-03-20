@@ -78,11 +78,12 @@ def export(
     res: Response, mdl: RequestFile, namespace: str = ""
 ) -> Iterable[Union[str, bytes]]:
     for key, pathspec in mdl.exports.items():
+        key = f"{namespace}{key}"
         try:
             value = read_pathspec(text=res.text, pathspec=pathspec)
         except Exception:
-            value = ""
-        yield f"{namespace}{key}='{value}'"
+            continue
+        yield f"{key}='{value}'"
 
 
 def export_file(
@@ -111,7 +112,7 @@ def export_file(
         try:
             value = read_pathspec(text=res.text, pathspec=pathspec)
         except Exception:
-            value = ""
+            continue
         line = f"{key}='{value}'\n"
         if key in existing:
             line_no = existing[key]
