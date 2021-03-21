@@ -1,0 +1,8 @@
+{
+  "$schema": "../../docs/schema.json",
+  "replacements": {
+    "{{METHOD}}": { "name": "METHOD" }
+  },
+  "url": "https://example.com",
+  "method": "{{METHOD}}"
+}

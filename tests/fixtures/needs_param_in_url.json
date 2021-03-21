@@ -1,0 +1,7 @@
+{
+  "$schema": "../../docs/schema.json",
+  "replacements": {
+    "{{PARAM}}": { "name": "PARAM" }
+  },
+  "url": "https://example.com?param={{PARAM}}"
+}

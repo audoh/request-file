@@ -1,0 +1,7 @@
+{
+  "$schema": "../../docs/schema.json",
+  "replacements": {
+    "{{URL}}": { "name": "URL" }
+  },
+  "url": "{{URL}}"
+}
