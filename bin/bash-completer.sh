@@ -26,6 +26,7 @@ _requestfile() {
   unset idx
 
   local curword="${comp_words[comp_cword]}"
+  local opts=""
   if [ "$allow_opt" = true ]; then
     if [ "$comp_cword" -ge 1 ]; then
       local prevword="${comp_words[comp_cword-1]}"
@@ -46,7 +47,7 @@ _requestfile() {
       fi
     fi
 
-    local opts="--replace -r"
+    opts="$opts --replace -r"
     opts="$opts --format -f"
     opts="$opts --print-curl -c"
     opts="$opts --dry-run -d"
@@ -59,7 +60,7 @@ _requestfile() {
   files=`compgen -f -- "$curword" | grep .json$`
   dirs=`compgen -d -S / -- "$curword"`
 
-  if [ -n "$dirs" ] && [ `echo "$dirs" | wc -l` -eq 1 ] && [ -z "$files" ]; then
+  if [ -n "$dirs" ] && [ `echo "$dirs" | wc -l` -eq 1 ] && [ -z "$files" ] && [ -z "$opts" ]; then
     # Having no luck whatsoever with compopt to disable the trailing space and the documentation is minimal
     # Making bash think it needs to stop to let you decide between the dir and some random gibberish works as well as anything
     # The reason this works is because although it's adding another result, once there is a trailing slash, compgen will look in that directory for results
