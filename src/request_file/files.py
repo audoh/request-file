@@ -9,7 +9,7 @@ def _get_re():
     if _re is not None:
         return _re
     _re = re.compile(
-        r"""(?:^|;)\s*([a-z_][a-z_0-9]*)=(?:([^\s]*)|'([^']*)'|"([^"]*)")\s*(?:$|;)""",
+        r"""(?:^|;)\s*([a-z_][a-z_0-9]*)=(?:'([^']*)'|"([^"]*)"|([^\s]*))\s*(?:$|;)""",
         flags=re.IGNORECASE,
     )
     return _re

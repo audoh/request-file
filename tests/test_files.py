@@ -13,6 +13,8 @@ from request_file import files
         ("  KEY=VALUE", "KEY", "VALUE", None),
         ("KEY=VALUE  ", "KEY", "VALUE", None),
         # Quoting
+        ("KEY='VALUE1'", "KEY", "VALUE1", None),
+        ('KEY="VALUE1"', "KEY", "VALUE1", None),
         ("KEY='VALUE1  VALUE2'", "KEY", "VALUE1  VALUE2", None),
         ('KEY="VALUE1  VALUE2"', "KEY", "VALUE1  VALUE2", None),
         # Single line
