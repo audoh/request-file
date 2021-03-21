@@ -56,8 +56,21 @@ _requestfile() {
 
   fi
 
-  compgen -d -S / -- "$cur"
-  compgen -f -- "$cur" | grep .json$ # Path to JSON file?
+  files=`compgen -f -- "$cur" | grep .json$`
+  dirs=`compgen -d -S / -- "$cur"`
+
+  if [ `echo "$dirs" | wc -l` -eq 1 ] && [ -z "$files" ]; then
+    compopt -o nospace
+  fi
+
+  for file in "$files";
+    echo "$file"
+  done
+
+  for dir in "$dirs"; do
+    echo "$dir"
+  done
+
 }
 
 _requestfile "$@"
