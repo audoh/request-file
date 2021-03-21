@@ -64,7 +64,7 @@ _requestfile() {
   done
 
   for dir in "$dirs"; do
-    compopt -o nospace -- "$dir"
+    compopt +o nospace -- "$dir"
     echo "$dir"
   done
 
