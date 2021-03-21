@@ -61,8 +61,10 @@ _requestfile() {
 
   if [ `echo "$dirs" | wc -l` -eq 1 ] && [ -z "$files" ]; then
     # Having no luck whatsoever with compopt to disable the trailing space and the documentation is minimal
-    # Making bash think it needs to stop to let you decide between the dir and some random gibberish works as well as anything
-    echo "${dirs[0]}asdf"
+    # Making bash think it needs to stop to let you decide between the dir and some random gibberish works as well as anything as long as the directory is not empty
+    # If the directory is empty then the tab result will be whatever the gibberish is
+    # So the gibberish should be the same as the directory
+    echo "${dirs[0]}${dirs[0]}"
   fi
 
   for file in "$files"; do
