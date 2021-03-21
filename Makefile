@@ -6,3 +6,7 @@ export PYTHONPATH := $(_dir)src
 .PHONY: schema
 schema:
 	poetry run python docs/build/schema.py docs/schema.json
+
+.PHONY: tests
+tests:
+	poetry run pytest --testdox
