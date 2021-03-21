@@ -13,35 +13,52 @@ _requestfile() {
 
   local cur="${comp_words[comp_cword]}"
 
-  if [ "$comp_cword" -ge 1 ]; then
-    local prev="${comp_words[comp_cword-1]}"
-
-    if [ "$prev" == "--replace" ] || [ "$prev" == "-r" ]; then
-      return
-    elif [ "$prev" == "--format" ] || [ "$prev" == "-f" ]; then
-      local formats
-      formats="$formats body"
-      formats="$formats verbose"
-      formats="$formats requests-mock"
-      compgen -W "$formats" -- "$cur"
-      return
-    elif [ "$prev" == "--output" ] || [ "$prev" == "-o" ] || \
-         [ "$prev" == "--exports" ] || [ "$prev" == "-e" ]; then
-      compgen -f -- "$cur"
-      return
+  # Check we don't have --
+  local allow_opt=true
+  local idx=0
+  until [ "$idx" -eq "$comp_cword" ]; do
+    local word="${comp_words[$idx]}"
+    if [ "$word" == "--" ]; then
+      allow_opt=falsebreak
     fi
+    idx=$(($idx + 1))
+  done
+  unset idx
+
+  if [ "$allow_opt" = true ]; then
+    if [ "$comp_cword" -ge 1 ]; then
+      local prev="${comp_words[comp_cword-1]}"
+
+
+      if [ "$prev" == "--replace" ] || [ "$prev" == "-r" ]; then
+        return
+      elif [ "$prev" == "--format" ] || [ "$prev" == "-f" ]; then
+        local formats
+        formats="$formats body"
+        formats="$formats verbose"
+        formats="$formats requests-mock"
+        compgen -W "$formats" -- "$cur"
+        return
+      elif [ "$prev" == "--output" ] || [ "$prev" == "-o" ] || \
+          [ "$prev" == "--exports" ] || [ "$prev" == "-e" ]; then
+        compgen -f -- "$cur"
+        return
+      fi
+    fi
+
+    local opts="--replace -r"
+    opts="$opts --format -f"
+    opts="$opts --print-curl -c"
+    opts="$opts --dry-run -d"
+    opts="$opts --print-exports -p"
+    opts="$opts --output -o"
+    opts="$opts --exports -e"
+    compgen -W "$opts" -- "$cur"
+
   fi
 
-  local opts="--replace -r"
-  opts="$opts --format -f"
-  opts="$opts --print-curl -c"
-  opts="$opts --dry-run -d"
-  opts="$opts --print-exports -p"
-  opts="$opts --output -o"
-  opts="$opts --exports -e"
 
   compgen -f -- "$cur" | grep .json$ # Path to JSON file?
-  compgen -W "$opts" -- "$cur"
 }
 
 _requestfile "$@"
