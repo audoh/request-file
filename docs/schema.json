@@ -1,69 +1,113 @@
 {
-  "$schema": "http://json-schema.org/schema",
-  "title": "Request Schema",
-  "description": "Schema of a request",
-  "examples": [
-    {
-      "replacements": {
-        ":name": { "required": true, "name": "CAT_NAME" }
-      },
-      "url": "https://myapi.net/api/v1/cat/:name",
-      "method": "POST",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {
-        "petTheCat": true
-      }
-    }
-  ],
+  "title": "RequestFile",
+  "type": "object",
   "properties": {
     "replacements": {
+      "title": "Replacements",
       "description": "Describes the dynamic replacements available/required for this request",
+      "default": {},
+      "type": "object",
       "additionalProperties": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "The name of this replacement, which will be used to find it in the input or environment variables; defaults to the replacement string"
-          },
-          "required": {
-            "type": "boolean",
-            "default": true
-          },
-          "default": {
-            "type": "string"
-          }
-        }
+        "$ref": "#/definitions/Replacement"
       }
     },
     "url": {
+      "title": "Url",
       "description": "Where to send the request, including any query string and anchor.",
-      "type": "string",
       "examples": [
         "https://myapi.net/api/v1/cat/:name?query={{QUERY}}#{{ANCHOR}}"
-      ]
+      ],
+      "type": "string"
     },
     "method": {
+      "title": "Method",
       "description": "The request method; can also be a replacement placeholder.",
-      "type": "string",
-      "examples": ["GET", "POST", "{{METHOD}}"]
+      "default": "GET",
+      "examples": [
+        "GET",
+        "POST",
+        "{{METHOD}}"
+      ],
+      "type": "string"
     },
     "headers": {
+      "title": "Headers",
       "description": "The headers to send for this request. Note that additional auto-generated headers, such as Content-Length and Content-Type, may also be sent.",
+      "default": {},
+      "type": "object",
       "additionalProperties": {
         "type": "string"
       }
     },
-    "body": {
-      "description": "The body of this request, if applicable.",
-      "anyOf": [
-        {
+    "text": {
+      "title": "Text",
+      "description": "The raw body of this request, if applicable.",
+      "type": "string"
+    },
+    "data": {
+      "title": "Data",
+      "description": "The form data of this request, if applicable.",
+      "type": "object"
+    },
+    "json": {
+      "title": "Json",
+      "description": "The JSON data of this request, if applicable."
+    },
+    "exports": {
+      "title": "Exports",
+      "description": "Path specs for variables to export from the response.",
+      "default": {},
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "url"
+  ],
+  "examples": [
+    {
+      "replacements": {
+        ":name": {
+          "name": "CAT_NAME",
+          "required": true,
+          "default": null
+        }
+      },
+      "url": "https://myapi.net/api/v1/cats/:name",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body_text": null,
+      "body_data": null,
+      "body_json": null,
+      "exports": {}
+    }
+  ],
+  "definitions": {
+    "Replacement": {
+      "title": "Replacement",
+      "type": "object",
+      "properties": {
+        "name": {
+          "title": "Name",
+          "description": "The name of this replacement, which will be used to find it in the input or environment variables; defaults to the replacement string",
           "type": "string"
         },
-        {
-          "type": "object"
+        "required": {
+          "title": "Required",
+          "default": true,
+          "type": "boolean"
+        },
+        "default": {
+          "title": "Default",
+          "type": "string"
         }
+      },
+      "required": [
+        "name"
       ]
     }
   }

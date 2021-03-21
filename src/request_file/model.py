@@ -1,9 +1,10 @@
 import json
-from typing import Any, Dict, Iterable, Mapping, MutableMapping, Optional, Type
+from typing import (Any, Dict, Generic, Iterable, Mapping, MutableMapping,
+                    Optional, Type, TypeVar)
 from urllib.parse import urlencode
 
 from pydantic import BaseModel, Field, validator
-from requests.models import CaseInsensitiveDict
+from requests.models import CaseInsensitiveDict as _CaseInsensitiveDict
 
 
 class Replacement(BaseModel):
@@ -13,6 +14,14 @@ class Replacement(BaseModel):
     )
     required: bool = True
     default: Optional[str] = None
+
+
+# Unlike the one in requests, this one can be JSON serialised
+T = TypeVar("T")
+
+
+class CaseInsensitiveDict(Generic[T], Dict[str, T], _CaseInsensitiveDict[T]):
+    pass
 
 
 class RequestFile(BaseModel):
@@ -129,5 +138,5 @@ class RequestFile(BaseModel):
                     method="POST",
                     headers={"Content-Type": "application/json"},
                     body={"petTheCat": True},
-                ).dict()
+                )
             ]
