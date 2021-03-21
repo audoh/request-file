@@ -60,6 +60,7 @@ _requestfile() {
   dirs=`compgen -d -S / -- "$cur"`
 
   if [ `echo "$dirs" | wc -l` -eq 1 ] && [ -z "$files" ]; then
+    echo "nospace" >&2
     compopt -o nospace
   fi
 
