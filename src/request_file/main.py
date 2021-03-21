@@ -2,15 +2,18 @@ import argparse
 import atexit
 from argparse import ArgumentParser
 from dataclasses import dataclass
-from os import getenv, path
+from os import getenv, makedirs, path
 from sys import argv
 from typing import Iterable, List, Tuple
 
 import requests
+from appdirs import user_state_dir
 
 from request_file import model
 from request_file.export import export, export_file
+from request_file.files import read_var
 from request_file.format import Format, format
+from request_file.history import InputHistory
 
 try:
     import readline
@@ -18,15 +21,16 @@ except Exception:
     readline = None
 
 
-def replacement(input: str) -> Tuple[str, str]:
-    key, value = input.split("=")
-    if not key:
-        raise ValueError(f"key is required")
+def _parse_replacement(input: str) -> Tuple[str, str]:
+    try:
+        key, value = read_var(input)
+    except ValueError as exc:
+        raise ValueError(f"key is required") from exc
     return key, value
 
 
 @dataclass
-class Arguments(argparse.Namespace):
+class _Arguments(argparse.Namespace):
     files: Iterable[str]
     replacements: Iterable[Tuple[str, str]]
     format: Format
@@ -37,25 +41,35 @@ class Arguments(argparse.Namespace):
     output_files: List[str]
 
 
-histfile = path.expanduser("~/.pyrequestfile-history")
+_state_dir = user_state_dir("request-file", "audoh")
+_input_history_path = path.join(_state_dir, "last-inputs")
+_readline_history_path = path.join(_state_dir, "readline-history")
+_input_history = InputHistory()
 
 
-def init_history() -> None:
+def _init_history() -> None:
+    try:
+        _input_history.read_input_file(_input_history_path)
+    except IOError:
+        pass
     if hasattr(readline, "read_history_file"):
         try:
-            readline.read_history_file(histfile)
+            readline.read_history_file(_readline_history_path)
         except IOError:
             pass
-        atexit.register(save_history)
 
 
-def save_history() -> None:
-    readline.set_history_length(1000)
-    readline.write_history_file(histfile)
+def _save_history() -> None:
+    makedirs(_state_dir, exist_ok=True)
+    _input_history.write_input_file(_input_history_path)
+    if hasattr(readline, "read_history_file"):
+        readline.set_history_length(1000)
+        readline.write_history_file(_readline_history_path)
 
 
 if __name__ == "__main__":
-    init_history()
+    _init_history()
+    atexit.register(_save_history)
 
     env_namespace = getenv("REQUESTFILE_NAMESPACE", "")
     if env_namespace:
@@ -68,7 +82,7 @@ if __name__ == "__main__":
         "-r",
         dest="replacements",
         default=[],
-        type=replacement,
+        type=_parse_replacement,
         action="append",
     )
     parser.add_argument(
@@ -93,28 +107,33 @@ if __name__ == "__main__":
     parser.add_argument(
         "--exports", "-e", dest="exports_files", action="append", default=[]
     )
-    args = Arguments(**vars(parser.parse_args(argv[1:])))
+    args = _Arguments(**vars(parser.parse_args(argv[1:])))
 
     replacements = {key: value for key, value in args.replacements}
 
     for file in args.files:
         mdl = model.RequestFile.load(file)
-        for key, _replacement in mdl.replacements.items():
+        for key, replacement in mdl.replacements.items():
             # Use explicit argument first
-            input_replacement = replacements.get(_replacement.name)
+            input_replacement = replacements.get(replacement.name)
             # Try to use environment var second
             if input_replacement is None:
-                input_replacement = getenv(f"{env_namespace}{_replacement.name}")
+                input_replacement = getenv(f"{env_namespace}{replacement.name}")
             # Use default value third if specified but offer the ability to override it
-            if input_replacement is None and _replacement.default:
+            default_value = replacement.default or _input_history.get_last_input(key)
+            if input_replacement is None and default_value:
                 input_replacement = input(
-                    f"Enter a value for {_replacement.name} ({_replacement.default}): "
+                    f"Enter a value for {replacement.name} ({default_value}): "
                 )
-                if not input_replacement:
-                    input_replacement = _replacement.default
+                if input_replacement:
+                    _input_history.update_input(key, input_replacement)
+                else:
+                    input_replacement = default_value
             # If no default specified but the replacement is required, prompt for value
-            if input_replacement is None and _replacement.required:
-                input_replacement = input(f"Enter a value for {_replacement.name}: ")
+            if input_replacement is None and replacement.required:
+                input_replacement = input(f"Enter a value for {replacement.name}: ")
+                if input_replacement:
+                    _input_history.update_input(key, input_replacement)
             # If we still haven't got a replacement then leave as-is
             if input_replacement is None:
                 continue
