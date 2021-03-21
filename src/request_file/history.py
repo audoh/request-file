@@ -29,3 +29,4 @@ class InputHistory:
             for key, value in self._inputs.items():
                 line = write_var(key, value)
                 fp.write(line)
+                fp.write("\n")
