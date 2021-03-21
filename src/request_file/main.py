@@ -120,20 +120,26 @@ if __name__ == "__main__":
             if input_replacement is None:
                 input_replacement = getenv(f"{env_namespace}{replacement.name}")
             # Use default value third if specified but offer the ability to override it
-            default_value = replacement.default or _input_history.get_last_input(key)
+            default_value = replacement.default or _input_history.get_last_input(
+                replacement.name, namespace=env_namespace
+            )
             if input_replacement is None and default_value:
                 input_replacement = input(
                     f"Enter a value for {replacement.name} ({default_value}): "
                 )
                 if input_replacement:
-                    _input_history.update_input(key, input_replacement)
+                    _input_history.update_input(
+                        replacement.name, input_replacement, namespace=env_namespace
+                    )
                 else:
                     input_replacement = default_value
             # If no default specified but the replacement is required, prompt for value
             if input_replacement is None and replacement.required:
                 input_replacement = input(f"Enter a value for {replacement.name}: ")
                 if input_replacement:
-                    _input_history.update_input(key, input_replacement)
+                    _input_history.update_input(
+                        replacement.name, input_replacement, namespace=env_namespace
+                    )
             # If we still haven't got a replacement then leave as-is
             if input_replacement is None:
                 continue
