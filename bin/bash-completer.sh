@@ -56,7 +56,7 @@ _requestfile() {
 
   fi
 
-  compgen -d -- "$cur"
+  compgen -d -S / -- "$cur"
   compgen -f -- "$cur" | grep .json$ # Path to JSON file?
 }
 
