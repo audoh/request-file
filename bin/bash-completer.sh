@@ -59,7 +59,6 @@ _requestfile() {
   files=`compgen -f -- "$curword" | grep .json$`
   dirs=`compgen -d -S / -- "$curword"`
 
-
   if [ -n "$dirs" ] && [ `echo "$dirs" | wc -l` -eq 1 ] && [ -z "$files" ]; then
     # Having no luck whatsoever with compopt to disable the trailing space and the documentation is minimal
     # Making bash think it needs to stop to let you decide between the dir and some random gibberish works as well as anything
