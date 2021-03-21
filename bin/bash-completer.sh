@@ -63,7 +63,7 @@ _requestfile() {
     compopt -o nospace
   fi
 
-  for file in "$files";
+  for file in "$files"; do
     echo "$file"
   done
 
