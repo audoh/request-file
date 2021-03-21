@@ -2,7 +2,7 @@
 name = "appdirs"
 version = "1.4.4"
 description = "A small Python module for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -157,7 +157,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "818bf512de3e8b7dc4ba9c0ba172cdd5e2fc28708bfe199315a91a100f299668"
+content-hash = "633b7ed4ae9b4ae82e00dfc9d4f61adf3b491238410878a9a2371478b9616231"
 
 [metadata.files]
 appdirs = [
