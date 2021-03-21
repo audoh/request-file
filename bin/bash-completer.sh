@@ -59,12 +59,15 @@ _requestfile() {
   files=`compgen -f -- "$cur" | grep .json$`
   dirs=`compgen -d -S / -- "$cur"`
 
+  if [ `echo "$dirs" | wc -l` -eq 1 ] && [ -z "$files" ]; then
+    compopt -o nospace
+  fi
+
   for file in "$files"; do
     echo "$file"
   done
 
   for dir in "$dirs"; do
-    compopt -o nospace "$dir"
     echo "$dir"
   done
 
