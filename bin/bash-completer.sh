@@ -29,7 +29,6 @@ _requestfile() {
     if [ "$comp_cword" -ge 1 ]; then
       local prev="${comp_words[comp_cword-1]}"
 
-
       if [ "$prev" == "--replace" ] || [ "$prev" == "-r" ]; then
         return
       elif [ "$prev" == "--format" ] || [ "$prev" == "-f" ]; then
