@@ -5,8 +5,6 @@ _requestfile() {
   shift 1
   local comp_words=("$@")
 
-  compopt -o nospace
-
   [ -n "$comp_cword" ] && [ "$comp_cword" -ge 0 ] 2>/dev/null
   if [ $? -ne 0 ]; then
     echo error: arg 1 must be integer index of current word >&2
@@ -61,6 +59,12 @@ _requestfile() {
   files=`compgen -f -- "$cur" | grep .json$`
   dirs=`compgen -d -S / -- "$cur"`
 
+  if [ `echo "$dirs" | wc -l` -eq 1 ] && [ -z "$files" ]; then
+    # Having no luck whatsoever with compopt to disable the trailing space and the documentation is minimal
+    # Making bash think it needs to stop to let you decide between the dir and some random gibberish works as well as anything
+    echo "${dirs[0]}asdf"
+  fi
+
   for file in "$files"; do
     echo "$file"
   done
@@ -68,7 +72,6 @@ _requestfile() {
   for dir in "$dirs"; do
     echo "$dir"
   done
-
 }
 
 _requestfile "$@"
