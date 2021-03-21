@@ -5,6 +5,7 @@ from typing import Any, Dict, Iterable, List, Sequence, Tuple, Union
 
 from requests import Response
 
+from request_file.files import read_var, write_var
 from request_file.model import RequestFile
 
 
@@ -83,7 +84,7 @@ def export(
             value = read_pathspec(text=res.text, pathspec=pathspec)
         except Exception:
             continue
-        yield f"{key}='{value}'"
+        yield write_var(key, value)
 
 
 def export_file(
@@ -96,11 +97,8 @@ def export_file(
             for line in fp:
                 line_no = len(lines)
                 lines.append(line)
-                stripped = line.lstrip()
-                if stripped.startswith("#"):
-                    continue
                 try:
-                    key = line[: line.index("=")]
+                    key, _ = read_var(line)
                 except ValueError:
                     continue
                 existing[key] = line_no
@@ -113,7 +111,7 @@ def export_file(
             value = read_pathspec(text=res.text, pathspec=pathspec)
         except Exception:
             continue
-        line = f"{key}='{value}'\n"
+        line = f"{write_var(key, value)}\n"
         if key in existing:
             line_no = existing[key]
             lines[line_no] = line
