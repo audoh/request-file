@@ -9,10 +9,10 @@ class InputHistory:
     def __init__(self) -> None:
         self._inputs: Dict[str, str] = {}
 
-    def update_input(self, name: str, value: str) -> None:
+    def update_input(self, name: str, value: str, namespace: str = "") -> None:
         self._inputs[name] = value
 
-    def get_last_input(self, name: str) -> str:
+    def get_last_input(self, name: str, namespace: str = "") -> str:
         return self._inputs.get(name, "")
 
     def read_input_file(self, path: str) -> None:
@@ -30,3 +30,4 @@ class InputHistory:
                 line = write_var(key, value)
                 fp.write(line)
                 fp.write("\n")
+            fp.write("\n")
