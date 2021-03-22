@@ -72,7 +72,8 @@ if __name__ == "__main__":
     _init_history()
     atexit.register(_save_history)
 
-    env_prefix = getenv("REQUESTFILE_NAMESPACE", "")
+    namespace = getenv("REQUESTFILE_NAMESPACE", "")
+    env_prefix = namespace
     if env_prefix:
         env_prefix += "_"
 
@@ -122,7 +123,7 @@ if __name__ == "__main__":
                 input_replacement = getenv(f"{env_prefix}{replacement.name}")
             # Use default value third if specified but offer the ability to override it
             default_value = replacement.default or _input_history.get_last_input(
-                replacement.name, namespace=env_prefix
+                replacement.name, namespace=namespace
             )
             if input_replacement is None and default_value:
                 input_replacement = input(
@@ -130,7 +131,7 @@ if __name__ == "__main__":
                 )
                 if input_replacement:
                     _input_history.update_input(
-                        replacement.name, input_replacement, namespace=env_prefix
+                        replacement.name, input_replacement, namespace=namespace
                     )
                 else:
                     input_replacement = default_value
@@ -139,7 +140,7 @@ if __name__ == "__main__":
                 input_replacement = input(f"Enter a value for {replacement.name}: ")
                 if input_replacement:
                     _input_history.update_input(
-                        replacement.name, input_replacement, namespace=env_prefix
+                        replacement.name, input_replacement, namespace=namespace
                     )
             # If we still haven't got a replacement then leave as-is
             if input_replacement is None:
