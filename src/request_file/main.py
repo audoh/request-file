@@ -10,8 +10,8 @@ import requests
 from appdirs import user_state_dir
 
 from request_file import model
-from request_file.export import export, export_file
-from request_file.files import read_var
+from request_file.export import export, get_exports, save_exports
+from request_file.files import read_var, write_var
 from request_file.format import Format, format
 from request_file.history import InputHistory
 
@@ -158,6 +158,8 @@ if __name__ == "__main__":
             res = requests.request(
                 method=mdl.method, url=mdl.url, headers=mdl.headers, data=mdl.body
             )
+
+            # Output response
             for file in args.output_files:
                 with open(file, "w") as fp:
                     for _str in format(res=res, mdl=mdl, format=args.format):
@@ -165,10 +167,11 @@ if __name__ == "__main__":
             for _str in format(res=res, mdl=mdl, format=args.format):
                 print(_str)
 
-            export_file(res=res, mdl=mdl, path=_env_path, prefix=env_prefix)
+            # Output environment exports
+            save_exports(res=res, mdl=mdl, path=_env_path, prefix=env_prefix)
             if args.exports_files:
                 for file in args.exports_files:
-                    export_file(res=res, mdl=mdl, path=file, prefix=env_prefix)
+                    save_exports(res=res, mdl=mdl, path=file, prefix=env_prefix)
             if args.print_exports:
-                for _str in export(res=res, mdl=mdl, prefix=env_prefix):
-                    print(_str)
+                for key, value in get_exports(res=res, mdl=mdl, prefix=env_prefix):
+                    print(write_var(key, value))

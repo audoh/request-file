@@ -75,19 +75,16 @@ def read_pathspec(text: str, pathspec: str) -> Any:
         )
 
 
-def export(
+def get_exports(
     res: Response, mdl: RequestFile, prefix: str = ""
-) -> Iterable[Union[str, bytes]]:
+) -> Iterable[Tuple[str, str]]:
     for key, pathspec in mdl.exports.items():
         key = f"{prefix}{key}"
-        try:
-            value = read_pathspec(text=res.text, pathspec=pathspec)
-        except Exception:
-            continue
-        yield write_var(key, value)
+        value = read_pathspec(text=res.text, pathspec=pathspec)
+        yield key, value
 
 
-def export_file(res: Response, mdl: RequestFile, path: str, prefix: str = "") -> None:
+def save_exports(res: Response, mdl: RequestFile, path: str, prefix: str = "") -> None:
     existing: Dict[str, int] = {}
     lines: List[str] = []
     try:
@@ -103,12 +100,7 @@ def export_file(res: Response, mdl: RequestFile, path: str, prefix: str = "") ->
     except FileNotFoundError:
         pass
 
-    for key, pathspec in mdl.exports.items():
-        key = f"{prefix}{key}"
-        try:
-            value = read_pathspec(text=res.text, pathspec=pathspec)
-        except Exception:
-            continue
+    for key, value in get_exports(res, mdl, prefix):
         line = f"{write_var(key, value)}\n"
         if key in existing:
             line_no = existing[key]
