@@ -44,6 +44,7 @@ class _Arguments(argparse.Namespace):
 _state_dir = user_state_dir("request-file", "audoh")
 _input_history_path = path.join(_state_dir, "last-inputs")
 _readline_history_path = path.join(_state_dir, "readline-history")
+_env_path = path.join(_state_dir, "environment")
 _input_history = InputHistory()
 
 
@@ -71,9 +72,9 @@ if __name__ == "__main__":
     _init_history()
     atexit.register(_save_history)
 
-    env_namespace = getenv("REQUESTFILE_NAMESPACE", "")
-    if env_namespace:
-        env_namespace += "_"
+    env_prefix = getenv("REQUESTFILE_NAMESPACE", "")
+    if env_prefix:
+        env_prefix += "_"
 
     parser = ArgumentParser()
     parser.add_argument("files", type=str, nargs="+")
@@ -118,10 +119,10 @@ if __name__ == "__main__":
             input_replacement = replacements.get(replacement.name)
             # Try to use environment var second
             if input_replacement is None:
-                input_replacement = getenv(f"{env_namespace}{replacement.name}")
+                input_replacement = getenv(f"{env_prefix}{replacement.name}")
             # Use default value third if specified but offer the ability to override it
             default_value = replacement.default or _input_history.get_last_input(
-                replacement.name, namespace=env_namespace
+                replacement.name, namespace=env_prefix
             )
             if input_replacement is None and default_value:
                 input_replacement = input(
@@ -129,7 +130,7 @@ if __name__ == "__main__":
                 )
                 if input_replacement:
                     _input_history.update_input(
-                        replacement.name, input_replacement, namespace=env_namespace
+                        replacement.name, input_replacement, namespace=env_prefix
                     )
                 else:
                     input_replacement = default_value
@@ -138,7 +139,7 @@ if __name__ == "__main__":
                 input_replacement = input(f"Enter a value for {replacement.name}: ")
                 if input_replacement:
                     _input_history.update_input(
-                        replacement.name, input_replacement, namespace=env_namespace
+                        replacement.name, input_replacement, namespace=env_prefix
                     )
             # If we still haven't got a replacement then leave as-is
             if input_replacement is None:
@@ -163,9 +164,10 @@ if __name__ == "__main__":
             for _str in format(res=res, mdl=mdl, format=args.format):
                 print(_str)
 
+            export_file(res=res, mdl=mdl, path=_env_path, prefix=env_prefix)
             if args.exports_files:
                 for file in args.exports_files:
-                    export_file(res=res, mdl=mdl, path=file, namespace=env_namespace)
+                    export_file(res=res, mdl=mdl, path=file, prefix=env_prefix)
             if args.print_exports:
-                for _str in export(res=res, mdl=mdl, namespace=env_namespace):
+                for _str in export(res=res, mdl=mdl, prefix=env_prefix):
                     print(_str)

@@ -76,10 +76,10 @@ def read_pathspec(text: str, pathspec: str) -> Any:
 
 
 def export(
-    res: Response, mdl: RequestFile, namespace: str = ""
+    res: Response, mdl: RequestFile, prefix: str = ""
 ) -> Iterable[Union[str, bytes]]:
     for key, pathspec in mdl.exports.items():
-        key = f"{namespace}{key}"
+        key = f"{prefix}{key}"
         try:
             value = read_pathspec(text=res.text, pathspec=pathspec)
         except Exception:
@@ -87,9 +87,7 @@ def export(
         yield write_var(key, value)
 
 
-def export_file(
-    res: Response, mdl: RequestFile, path: str, namespace: str = ""
-) -> None:
+def export_file(res: Response, mdl: RequestFile, path: str, prefix: str = "") -> None:
     existing: Dict[str, int] = {}
     lines: List[str] = []
     try:
@@ -106,7 +104,7 @@ def export_file(
         pass
 
     for key, pathspec in mdl.exports.items():
-        key = f"{namespace}{key}"
+        key = f"{prefix}{key}"
         try:
             value = read_pathspec(text=res.text, pathspec=pathspec)
         except Exception:
