@@ -18,7 +18,7 @@ schema: docs/schema.json
 
 .PHONY: tests
 tests: .venv
-	poetry run pytest --testdox
+	poetry run pytest --testdox $$PYTEST_ARGS
 
 docs/schema.json: .venv docs/build/schema.py $(wildcard src/**/*.py)
 	poetry run python docs/build/schema.py docs/schema.json

@@ -94,7 +94,7 @@ def _save_history() -> None:
         fp.write("\n")
 
 
-if __name__ == "__main__":
+def main(*argv: str) -> None:
     _init_history()
     atexit.register(_save_history)
 
@@ -305,3 +305,7 @@ if __name__ == "__main__":
                     res=res, mdl=mdl, prefix=env_prefix
                 ):
                     print(write_var(export_key, export_value))
+
+
+if __name__ == "__main__":
+    main(*argv)
