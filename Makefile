@@ -14,3 +14,5 @@ schema:
 .PHONY: tests
 tests:
 	poetry run pytest --testdox
+
+all: build schema tests
