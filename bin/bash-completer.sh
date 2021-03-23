@@ -41,6 +41,7 @@ _requestfile() {
         compgen -W "$formats" -- "$curword"
         return
       elif [ "$prevword" == "--output" ] || [ "$prevword" == "-o" ] || \
+          [ "$prevword" == "--imports" ] || [ "$prevword" == "-i" ] || \
           [ "$prevword" == "--exports" ] || [ "$prevword" == "-e" ]; then
         compgen -f -- "$curword"
         return
@@ -54,6 +55,7 @@ _requestfile() {
     opts="$opts --dry-run"
     opts="$opts --print-exports"
     opts="$opts --output -o"
+    opts="$opts --imports -i"
     opts="$opts --exports -e"
     opts="$opts --no-prompt -n"
     opts="$(compgen -W "$opts" -- "$curword")"

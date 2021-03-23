@@ -38,6 +38,7 @@ class _Arguments(argparse.Namespace):
     dry_run: bool
     print_curl: bool
     print_exports: bool
+    imports_files: List[str]
     exports_files: List[str]
     output_files: List[str]
     no_prompt: bool
@@ -97,11 +98,6 @@ if __name__ == "__main__":
     _init_history()
     atexit.register(_save_history)
 
-    namespace = environ.get("REQUESTFILE_NAMESPACE", "")
-    env_prefix = namespace
-    if env_prefix:
-        env_prefix += "_"
-
     # Arg parsing
     parser = ArgumentParser()
     parser.add_argument(
@@ -159,6 +155,15 @@ if __name__ == "__main__":
         metavar="<file>",
     )
     parser.add_argument(
+        "-i",
+        "--imports",
+        dest="imports_files",
+        action="append",
+        default=[],
+        help="Path to a file where environment variables can be imported from. Multiple can be specified.",
+        metavar="<file>",
+    )
+    parser.add_argument(
         "-e",
         "--exports",
         dest="exports_files",
@@ -178,8 +183,24 @@ if __name__ == "__main__":
     args = _Arguments(**vars(parser.parse_args(argv[1:])))
     replacements = {key: value for key, value in args.replacements}
 
-    for export_file in args.files:
-        mdl = model.RequestFile.load(export_file)
+    # Env import
+    for import_file in args.imports_files:
+        with open(import_file, "r") as fp:
+            for line in fp:
+                try:
+                    import_key, import_value = read_var(line)
+                except ValueError:
+                    continue
+                environ[import_key] = import_value
+
+    # Resolve var namespace
+    namespace = environ.get("REQUESTFILE_NAMESPACE", "")
+    env_prefix = namespace
+    if env_prefix:
+        env_prefix += "_"
+
+    for request_file in args.files:
+        mdl = model.RequestFile.load(request_file)
 
         # Replacement/substitution
         for replacement_key, replacement in mdl.replacements.items():
