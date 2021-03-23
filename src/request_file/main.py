@@ -187,7 +187,7 @@ if __name__ == "__main__":
             except ValueError as exc:
                 print(f"error: {exc}", file=stderr)
                 exit(1)
-            mdl = mdl.replace(old=replacement_key, new=parsed)
+            mdl = model.RequestFile.replace(mdl, old=replacement_key, new=parsed)
 
         qsl = urlparse.parse_qsl(urlparse.urlparse(mdl.url).query)
         for param, param_value in mdl.params.items():

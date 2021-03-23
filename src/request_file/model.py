@@ -162,15 +162,16 @@ class RequestFile(BaseModel):
             ]
         return val_in
 
-    def replace(self, old: str, new: Any) -> "RequestFile":
-        url = self.url.replace(old, RequestFile._str(new))
-        method = RequestFile._str(new) if self.method == old else self.method
-        headers = RequestFile._replace(self.headers, old=old, new=new)
-        params = RequestFile._replace(self.params, old=old, new=new)
-        text = RequestFile._replace(self.body_text, old=old, new=new)
-        form_data = RequestFile._replace(self.body_data, old=old, new=new)
-        json = RequestFile._replace(self.body_json, old=old, new=new)
-        return self.copy(
+    @staticmethod
+    def replace(model: "RequestFile", old: str, new: Any) -> "RequestFile":
+        url = model.url.replace(old, RequestFile._str(new))
+        method = RequestFile._str(new) if model.method == old else model.method
+        headers = RequestFile._replace(model.headers, old=old, new=new)
+        params = RequestFile._replace(model.params, old=old, new=new)
+        text = RequestFile._replace(model.body_text, old=old, new=new)
+        form_data = RequestFile._replace(model.body_data, old=old, new=new)
+        json = RequestFile._replace(model.body_json, old=old, new=new)
+        return model.copy(
             update={
                 "url": url,
                 "method": method,
