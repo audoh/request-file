@@ -175,13 +175,15 @@ if __name__ == "__main__":
             if input_replacement is None:
                 continue
             try:
-                parsed = replacement.parse_value(input_replacement)
+                parsed = (
+                    replacement.parse_value(input_replacement)
+                    if isinstance(input_replacement, str)
+                    else input_replacement
+                )
             except ValueError as exc:
                 print(f"error: {exc}", file=stderr)
                 exit(1)
-            mdl = mdl.replace(
-                old=replacement_key, new=replacement.parse_value(input_replacement)
-            )
+            mdl = mdl.replace(old=replacement_key, new=parsed)
 
         # cURL
         if args.print_curl:
