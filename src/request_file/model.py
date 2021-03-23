@@ -7,11 +7,13 @@ from typing import (
     Dict,
     Generic,
     Iterable,
+    List,
     Mapping,
     MutableMapping,
     Optional,
     Type,
     TypeVar,
+    Union,
 )
 from urllib.parse import urlencode
 
@@ -28,8 +30,6 @@ def _parse_bool(val: str) -> bool:
 
 
 class Replacement(BaseModel):
-    _unset = object()
-
     types: ClassVar[Dict[str, Callable[[str], Any]]] = {
         "string": str,
         "number": float,
@@ -42,12 +42,12 @@ class Replacement(BaseModel):
         description="The name of this replacement, which will be used to find it in the input or environment variables; defaults to the replacement string",
     )
     required: bool = True
-    default: Optional[Any] = _unset
+    default: Optional[Any] = None
     type: str = Field("string", examples=[_type for _type in types])
 
     @property
     def has_default(self) -> bool:
-        return self.default is not Replacement._unset
+        return "default" in self.__fields_set__
 
     def parse_value(self, value: str) -> Any:
         try:
@@ -82,6 +82,10 @@ class RequestFile(BaseModel):
     headers: Dict[str, str] = Field(
         {},
         description="The headers to send for this request. Note that additional auto-generated headers, such as Content-Length and Content-Type, may also be sent.",
+    )
+    params: Dict[str, Union[str, List[str]]] = Field(
+        {},
+        description="Query/search parameters for this request. Lists of values are passed as repeated parameters i.e. param=1&param=2.",
     )
     body_text: Optional[str] = Field(
         None, alias="text", description="The raw body of this request, if applicable."
@@ -122,7 +126,9 @@ class RequestFile(BaseModel):
 
     @staticmethod
     def _str(val: Any) -> str:
-        if isinstance(val, bool):
+        if val == None:
+            return "null"
+        elif isinstance(val, bool):
             if val == True:
                 return "true"
             else:
@@ -160,6 +166,7 @@ class RequestFile(BaseModel):
         url = self.url.replace(old, RequestFile._str(new))
         method = RequestFile._str(new) if self.method == old else self.method
         headers = RequestFile._replace(self.headers, old=old, new=new)
+        params = RequestFile._replace(self.params, old=old, new=new)
         text = RequestFile._replace(self.body_text, old=old, new=new)
         form_data = RequestFile._replace(self.body_data, old=old, new=new)
         json = RequestFile._replace(self.body_json, old=old, new=new)
@@ -168,6 +175,7 @@ class RequestFile(BaseModel):
                 "url": url,
                 "method": method,
                 "headers": headers,
+                "params": params,
                 "body_text": text,
                 "body_data": form_data,
                 "body_json": json,

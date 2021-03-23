@@ -39,6 +39,25 @@
         "type": "string"
       }
     },
+    "params": {
+      "title": "Params",
+      "description": "Query/search parameters for this request. Lists of values are passed as repeated parameters i.e. param=1&param=2.",
+      "default": {},
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
     "text": {
       "title": "Text",
       "description": "The raw body of this request, if applicable.",
@@ -81,6 +100,7 @@
       "headers": {
         "Content-Type": "application/json"
       },
+      "params": {},
       "body_text": null,
       "body_data": null,
       "body_json": null,

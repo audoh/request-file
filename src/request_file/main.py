@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from os import environ, makedirs, path
 from sys import argv, stderr
 from typing import Dict, Iterable, List, Tuple
+from urllib import parse as urlparse
 
 import requests
 from appdirs import user_state_dir
@@ -143,8 +144,9 @@ if __name__ == "__main__":
         for replacement_key, replacement in mdl.replacements.items():
             # Use explicit argument first
             input_replacement = replacements.get(replacement.name)
+            is_set = input_replacement is not None
             # Try to use environment var second
-            if input_replacement is None:
+            if not is_set:
                 input_replacement = environ.get(f"{env_prefix}{replacement.name}")
             # Use default value third if specified but offer the ability to override it
             default_value = (
@@ -154,7 +156,7 @@ if __name__ == "__main__":
                     replacement.name, namespace=namespace
                 )
             )
-            if input_replacement is None and replacement.has_default:
+            if not is_set and (replacement.has_default or default_value):
                 input_replacement = input(
                     f"Enter a value for {replacement.name} ({default_value}): "
                 )
@@ -164,15 +166,17 @@ if __name__ == "__main__":
                     )
                 else:
                     input_replacement = default_value
+                is_set = True
             # If no default specified but the replacement is required, prompt for value
-            if input_replacement is None and replacement.required:
+            if not is_set and replacement.required:
                 input_replacement = input(f"Enter a value for {replacement.name}: ")
                 if input_replacement:
                     _input_history.update_input(
                         replacement.name, input_replacement, namespace=namespace
                     )
+                    is_set = True
             # If we still haven't got a replacement then leave as-is
-            if input_replacement is None:
+            if not is_set:
                 continue
             try:
                 parsed = (
@@ -185,16 +189,27 @@ if __name__ == "__main__":
                 exit(1)
             mdl = mdl.replace(old=replacement_key, new=parsed)
 
+        qsl = urlparse.parse_qsl(urlparse.urlparse(mdl.url).query)
+        for param, param_value in mdl.params.items():
+            if isinstance(param_value, str):
+                qsl.append((param, param_value))
+            else:
+                for param_subvalue in param_value:
+                    qsl.append((param, param_subvalue))
+        qs = urlparse.urlencode(qsl)
+        url = urlparse.urljoin(mdl.url, f"?{qs}")
+
         # cURL
         if args.print_curl:
             header_string = " ".join(
                 f"-H '{key}: {value}'" for key, value in mdl.headers.items()
             )
-            print(f"curl -X {mdl.method} {header_string} -d '{mdl.body}' -L {mdl.url}")
+
+            print(f"curl -X {mdl.method} {header_string} -d '{mdl.body}' -L {url}")
 
         if not args.dry_run:
             res = requests.request(
-                method=mdl.method, url=mdl.url, headers=mdl.headers, data=mdl.body
+                method=mdl.method, url=url, headers=mdl.headers, data=mdl.body
             )
 
             # Output response
