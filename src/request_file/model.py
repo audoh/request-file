@@ -28,6 +28,8 @@ def _parse_bool(val: str) -> bool:
 
 
 class Replacement(BaseModel):
+    _unset = object()
+
     types: ClassVar[Dict[str, Callable[[str], Any]]] = {
         "string": str,
         "number": float,
@@ -40,8 +42,12 @@ class Replacement(BaseModel):
         description="The name of this replacement, which will be used to find it in the input or environment variables; defaults to the replacement string",
     )
     required: bool = True
-    default: Optional[Any] = None
+    default: Optional[Any] = _unset
     type: str = Field("string", examples=[_type for _type in types])
+
+    @property
+    def has_default(self) -> bool:
+        return self.default is not Replacement._unset
 
     def parse_value(self, value: str) -> Any:
         try:

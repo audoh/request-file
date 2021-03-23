@@ -147,10 +147,14 @@ if __name__ == "__main__":
             if input_replacement is None:
                 input_replacement = environ.get(f"{env_prefix}{replacement.name}")
             # Use default value third if specified but offer the ability to override it
-            default_value = replacement.default or _input_history.get_last_input(
-                replacement.name, namespace=namespace
+            default_value = (
+                replacement.default
+                if replacement.has_default
+                else _input_history.get_last_input(
+                    replacement.name, namespace=namespace
+                )
             )
-            if input_replacement is None and default_value:
+            if input_replacement is None and replacement.has_default:
                 input_replacement = input(
                     f"Enter a value for {replacement.name} ({default_value}): "
                 )
