@@ -104,7 +104,12 @@ if __name__ == "__main__":
 
     # Arg parsing
     parser = ArgumentParser()
-    parser.add_argument("files", type=str, nargs="+")
+    parser.add_argument(
+        "files",
+        type=str,
+        nargs="+",
+        help="JSON files which follow the Request File schema.",
+    )
     parser.add_argument(
         "--replace",
         "-r",
@@ -114,13 +119,28 @@ if __name__ == "__main__":
         action="append",
     )
     parser.add_argument(
-        "--format", "-f", dest="format", default=Format.DEFAULT, type=Format
+        "--format",
+        "-f",
+        dest="format",
+        default=Format.DEFAULT,
+        type=Format,
+        help="Output format to use.",
     )
     parser.add_argument(
-        "--print-curl", "-c", dest="print_curl", default=False, action="store_true"
+        "--print-curl",
+        "-c",
+        dest="print_curl",
+        default=False,
+        action="store_true",
+        help="Output the equivalent cURL command to stdout.",
     )
     parser.add_argument(
-        "--dry-run", "-d", dest="dry_run", default=False, action="store_true"
+        "--dry-run",
+        "-d",
+        dest="dry_run",
+        default=False,
+        action="store_true",
+        help="Don't send the request. Generally used in combination with --print-curl.",
     )
     parser.add_argument(
         "--print-exports",
@@ -128,15 +148,31 @@ if __name__ == "__main__":
         dest="print_exports",
         default=False,
         action="store_true",
+        help="Output environment variables read from the response to stdout.",
     )
     parser.add_argument(
-        "--output", "-o", dest="output_files", action="append", default=[]
+        "--output",
+        "-o",
+        dest="output_files",
+        action="append",
+        default=[],
+        help="Path to a file where the response should be saved. Multiple can be specified.",
     )
     parser.add_argument(
-        "--exports", "-e", dest="exports_files", action="append", default=[]
+        "--exports",
+        "-e",
+        dest="exports_files",
+        action="append",
+        default=[],
+        help="Path to a file where environment variables read from the response should be saved. Multiple can be specified.",
     )
     parser.add_argument(
-        "--no-prompt", "-n", dest="no_prompt", default=False, action="store_true"
+        "--no-prompt",
+        "-n",
+        dest="no_prompt",
+        default=False,
+        action="store_true",
+        help="When values are not set in the environment, don't prompt for them. Use the defaults if available, or otherwise skip them entirely.",
     )
     args = _Arguments(**vars(parser.parse_args(argv[1:])))
     replacements = {key: value for key, value in args.replacements}
