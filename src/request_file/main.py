@@ -128,7 +128,6 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--print-curl",
-        "-c",
         dest="print_curl",
         default=False,
         action="store_true",
@@ -136,7 +135,6 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--dry-run",
-        "-d",
         dest="dry_run",
         default=False,
         action="store_true",
@@ -144,7 +142,6 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--print-exports",
-        "-p",
         dest="print_exports",
         default=False,
         action="store_true",
