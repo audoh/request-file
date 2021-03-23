@@ -1,4 +1,3 @@
-import pytest
 from py.path import local
 from request_file.main import main
 from request_file.model import RequestFile
