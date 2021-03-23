@@ -195,6 +195,8 @@ if __name__ == "__main__":
                 qsl.append((param, param_value))
             else:
                 for param_subvalue in param_value:
+                    if param_subvalue == None:
+                        continue
                     qsl.append((param, param_subvalue))
         qs = urlparse.urlencode(qsl)
         url = urlparse.urljoin(mdl.url, f"?{qs}")
