@@ -22,7 +22,7 @@ class Replacement(BaseModel):
         description="The name of this replacement, which will be used to find it in the input or environment variables; defaults to the replacement string",
     )
     required: bool = True
-    default: Optional[str] = None
+    default: Optional[Any] = None
 
 
 # Unlike the one in requests, this one can be JSON serialised
