@@ -192,11 +192,13 @@ if __name__ == "__main__":
 
         qsl = urlparse.parse_qsl(urlparse.urlparse(mdl.url).query)
         for param, param_value in mdl.params.items():
-            if isinstance(param_value, str):
+            if param_value is None:
+                continue
+            elif isinstance(param_value, str):
                 qsl.append((param, param_value))
             else:
                 for param_subvalue in param_value:
-                    if param_subvalue == None:
+                    if param_subvalue is None:
                         continue
                     qsl.append((param, param_subvalue))
         qs = urlparse.urlencode(qsl)
