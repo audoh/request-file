@@ -55,6 +55,7 @@ _requestfile() {
     opts="$opts --print-exports -p"
     opts="$opts --output -o"
     opts="$opts --exports -e"
+    opts="$opts --no-prompt -n"
     opts="$(compgen -W "$opts" -- "$curword")"
   fi
 

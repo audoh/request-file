@@ -40,6 +40,7 @@ class _Arguments(argparse.Namespace):
     print_exports: bool
     exports_files: List[str]
     output_files: List[str]
+    no_prompt: bool
 
 
 _state_dir = user_state_dir("request-file", "audoh")
@@ -134,6 +135,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--exports", "-e", dest="exports_files", action="append", default=[]
     )
+    parser.add_argument(
+        "--no-prompt", "-n", dest="no_prompt", default=False, action="store_true"
+    )
     args = _Arguments(**vars(parser.parse_args(argv[1:])))
     replacements = {key: value for key, value in args.replacements}
 
@@ -158,10 +162,11 @@ if __name__ == "__main__":
                 )
             )
             if not is_set and (replacement.has_default or default_value):
-                input_replacement = input(
-                    f"Enter a value for {replacement.name} ({default_value}): "
-                )
-                if input_replacement:
+                if not args.no_prompt:
+                    input_replacement = input(
+                        f"Enter a value for {replacement.name} ({default_value}): "
+                    )
+                if not args.no_prompt and input_replacement:
                     _input_history.update_input(
                         replacement.name, input_replacement, namespace=namespace
                     )
@@ -170,12 +175,13 @@ if __name__ == "__main__":
                 is_set = True
             # If no default specified but the replacement is required, prompt for value
             if not is_set and replacement.required:
-                input_replacement = input(f"Enter a value for {replacement.name}: ")
-                if input_replacement:
-                    _input_history.update_input(
-                        replacement.name, input_replacement, namespace=namespace
-                    )
-                    is_set = True
+                if not args.no_prompt:
+                    input_replacement = input(f"Enter a value for {replacement.name}: ")
+                    if input_replacement:
+                        _input_history.update_input(
+                            replacement.name, input_replacement, namespace=namespace
+                        )
+                        is_set = True
             # If we still haven't got a replacement then leave as-is
             if not is_set:
                 continue
