@@ -129,8 +129,6 @@ class RequestFile(BaseModel):
         return ""
 
     class Config:
-        arbitrary_types_allowed: bool = True
-
         @staticmethod
         def schema_extra(schema: Dict[str, Any], model: Type["Replacement"]) -> None:
             schema["examples"] = [
