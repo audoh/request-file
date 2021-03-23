@@ -114,6 +114,7 @@ if __name__ == "__main__":
         "--replace",
         "-r",
         dest="replacements",
+        metavar="REPLACEMENT=VALUE",
         default=[],
         type=_parse_replacement,
         action="append",
