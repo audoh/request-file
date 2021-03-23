@@ -3,7 +3,7 @@ import atexit
 from argparse import ArgumentParser
 from dataclasses import dataclass
 from os import environ, makedirs, path
-from sys import argv
+from sys import argv, stderr
 from typing import Dict, Iterable, List, Tuple
 
 import requests
@@ -170,7 +170,14 @@ if __name__ == "__main__":
             # If we still haven't got a replacement then leave as-is
             if input_replacement is None:
                 continue
-            mdl = mdl.replace(old=replacement_key, new=input_replacement)
+            try:
+                parsed = replacement.parse_value(input_replacement)
+            except ValueError as exc:
+                print(f"error: {exc}", file=stderr)
+                exit(1)
+            mdl = mdl.replace(
+                old=replacement_key, new=replacement.parse_value(input_replacement)
+            )
 
         # cURL
         if args.print_curl:

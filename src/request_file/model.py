@@ -1,6 +1,9 @@
 import json
+from enum import Enum
 from typing import (
     Any,
+    Callable,
+    ClassVar,
     Dict,
     Generic,
     Iterable,
@@ -16,13 +19,35 @@ from pydantic import BaseModel, Field, validator
 from requests.models import CaseInsensitiveDict as _CaseInsensitiveDict
 
 
+def _parse_bool(val: str) -> bool:
+    if val.lower() in ("true", "1"):
+        return True
+    elif val.lower() in ("false", "0"):
+        return False
+    raise ValueError(f"invalid boolean value: {val}")
+
+
 class Replacement(BaseModel):
+    types: ClassVar[Dict[str, Callable[[str], Any]]] = {
+        "string": str,
+        "number": float,
+        "integer": int,
+        "boolean": _parse_bool,
+    }
+
     name: str = Field(
         ...,
         description="The name of this replacement, which will be used to find it in the input or environment variables; defaults to the replacement string",
     )
     required: bool = True
     default: Optional[Any] = None
+    type: str = Field("string", examples=[_type for _type in types])
+
+    def parse_value(self, value: str) -> Any:
+        try:
+            return self.types[self.type](value)
+        except KeyError as exc:
+            raise ValueError(f"unknown type {self.type}") from exc
 
 
 # Unlike the one in requests, this one can be JSON serialised
@@ -125,9 +150,9 @@ class RequestFile(BaseModel):
             ]
         return val_in
 
-    def replace(self, old: str, new: str) -> "RequestFile":
-        url = self.url.replace(old, new)
-        method = new if self.method == old else self.method
+    def replace(self, old: str, new: Any) -> "RequestFile":
+        url = self.url.replace(old, RequestFile._str(new))
+        method = RequestFile._str(new) if self.method == old else self.method
         headers = RequestFile._replace(self.headers, old=old, new=new)
         text = RequestFile._replace(self.body_text, old=old, new=new)
         form_data = RequestFile._replace(self.body_data, old=old, new=new)

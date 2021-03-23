@@ -72,7 +72,8 @@
         ":name": {
           "name": "CAT_NAME",
           "required": true,
-          "default": null
+          "default": null,
+          "type": "string"
         }
       },
       "url": "https://myapi.net/api/v1/cats/:name",
@@ -102,7 +103,17 @@
           "type": "boolean"
         },
         "default": {
-          "title": "Default",
+          "title": "Default"
+        },
+        "type": {
+          "title": "Type",
+          "default": "string",
+          "examples": [
+            "string",
+            "number",
+            "integer",
+            "boolean"
+          ],
           "type": "string"
         }
       },
