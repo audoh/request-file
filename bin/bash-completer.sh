@@ -47,6 +47,7 @@ _requestfile() {
       fi
     fi
 
+    opts="$opts --help -h"
     opts="$opts --replace -r"
     opts="$opts --format -f"
     opts="$opts --print-curl -c"
