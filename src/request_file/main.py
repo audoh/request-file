@@ -62,14 +62,17 @@ def _init_history() -> None:
         except IOError:
             pass
     # Read exports
-    with open(_env_path, "r") as fp:
-        for line in fp:
-            try:
-                k, v = read_var(line)
-            except ValueError:
-                continue
-            environ[k] = v
-            _exported_vars[k] = v
+    try:
+        with open(_env_path, "r") as fp:
+            for line in fp:
+                try:
+                    k, v = read_var(line)
+                except ValueError:
+                    continue
+                environ[k] = v
+                _exported_vars[k] = v
+    except IOError:
+        pass
 
 
 def _save_history() -> None:
