@@ -7,7 +7,10 @@ build: .venv $(wildcard src/**/*.py)
 	cp build/main.bin bin/request-file.bin 2> /dev/null || true
 	cp build/main.exe bin/request-file.exe 2> /dev/null || true
 
-.PHONY: schema
+.INTERMEDIATE: install
+install: .venv
+
+.INTERMEDIATE: schema
 schema: docs/schema.json
 
 .PHONY: tests
