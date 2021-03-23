@@ -8,11 +8,13 @@ build: $(wildcard src/**/*.py) poetry.lock
 	cp build/main.exe bin/request-file.exe 2> /dev/null || true
 
 .PHONY: schema
-schema:
-	poetry run python docs/build/schema.py docs/schema.json
+schema: docs/schema.json
 
 .PHONY: tests
 tests:
 	poetry run pytest --testdox
 
 all: build schema tests
+
+docs/schema.json: $(wildcard src/**/*.py) poetry.lock docs/build/schema.py
+	poetry run python docs/build/schema.py docs/schema.json
