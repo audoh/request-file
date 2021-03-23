@@ -5,3 +5,5 @@ __pycache__
 !.github
 !.dockerignore
 build
+bin/request-file.bin
+bin/request-file.exe
