@@ -111,19 +111,20 @@ if __name__ == "__main__":
         help="JSON files which follow the Request File schema.",
     )
     parser.add_argument(
-        "--replace",
         "-r",
+        "--replace",
         dest="replacements",
-        metavar="REPLACEMENT=VALUE",
+        metavar="<name>=<value>",
         default=[],
         type=_parse_replacement,
         action="append",
     )
     parser.add_argument(
-        "--format",
         "-f",
+        "--format",
         dest="format",
         default=Format.DEFAULT,
+        choices=[format.value for format in Format],
         type=Format,
         help="Output format to use.",
     )
@@ -149,24 +150,26 @@ if __name__ == "__main__":
         help="Output environment variables read from the response to stdout.",
     )
     parser.add_argument(
-        "--output",
         "-o",
+        "--output",
         dest="output_files",
         action="append",
         default=[],
         help="Path to a file where the response should be saved. Multiple can be specified.",
+        metavar="<file>",
     )
     parser.add_argument(
-        "--exports",
         "-e",
+        "--exports",
         dest="exports_files",
         action="append",
         default=[],
         help="Path to a file where environment variables read from the response should be saved. Multiple can be specified.",
+        metavar="<file>",
     )
     parser.add_argument(
-        "--no-prompt",
         "-n",
+        "--no-prompt",
         dest="no_prompt",
         default=False,
         action="store_true",
