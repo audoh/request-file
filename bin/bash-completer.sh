@@ -68,6 +68,12 @@ _requestfile() {
     echo "${dirs[0]}asdf"
   fi
 
+  for opt in "$opts"; do
+    if [ -n "$opt" ]; then
+      echo "$opt"
+    fi
+  done
+
   for file in "$files"; do
     if [ -n "$file" ]; then
       echo "$file"
