@@ -5,7 +5,6 @@ export PYTHONPATH := $(_dir)src
 .INTERMEDIATE: all
 all: build schema tests
 
-
 build: .venv $(wildcard src/**/*.py)
 	poetry run python -m nuitka --follow-imports src/request_file/main.py --output-dir=build
 	cp build/main.bin bin/request-file.bin 2> /dev/null || true
