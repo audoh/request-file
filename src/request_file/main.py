@@ -181,7 +181,7 @@ if __name__ == "__main__":
                 continue
             try:
                 parsed = (
-                    replacement.parse_value(input_replacement)
+                    model.parse_replacement(value=input_replacement, model=replacement)
                     if isinstance(input_replacement, str)
                     else input_replacement
                 )

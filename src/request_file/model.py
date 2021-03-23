@@ -49,12 +49,6 @@ class Replacement(BaseModel):
     def has_default(self) -> bool:
         return "default" in self.__fields_set__
 
-    def parse_value(self, value: str) -> Any:
-        try:
-            return self.types[self.type](value)
-        except KeyError as exc:
-            raise ValueError(f"unknown type {self.type}") from exc
-
 
 # Unlike the one in requests, this one can be JSON serialised
 T = TypeVar("T")
@@ -202,3 +196,10 @@ def replace(model: RequestFile, old: str, new: Any) -> RequestFile:
             "body_json": json,
         }
     )
+
+
+def parse_replacement(value: str, model: Replacement) -> Any:
+    try:
+        return model.types[model.type](value)
+    except KeyError as exc:
+        raise ValueError(f"unknown type {model.type}") from exc
