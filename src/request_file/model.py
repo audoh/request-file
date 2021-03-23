@@ -1,6 +1,15 @@
 import json
-from typing import (Any, Dict, Generic, Iterable, Mapping, MutableMapping,
-                    Optional, Type, TypeVar)
+from typing import (
+    Any,
+    Dict,
+    Generic,
+    Iterable,
+    Mapping,
+    MutableMapping,
+    Optional,
+    Type,
+    TypeVar,
+)
 from urllib.parse import urlencode
 
 from pydantic import BaseModel, Field, validator
@@ -81,13 +90,20 @@ class RequestFile(BaseModel):
             return cls(**json.load(fp))
 
     @staticmethod
-    def _replace(val_in: Any, *, old: str, new: str) -> Any:
+    def _replace(val_in: Any, *, old: str, new: Any) -> Any:
         if isinstance(val_in, str):
-            return val_in.replace(old, new)
+            if val_in == old:
+                return new
+            else:
+                return val_in.replace(old, json.dumps(new))
         elif isinstance(val_in, Mapping):
             val_out: Dict[str, Any] = {}
             for old_key, old_value in val_in.items():
-                new_key = old_key.replace(old, new)
+                new_key = (
+                    old_key.replace(old, json.dumps(new))
+                    if isinstance(old_key, str)
+                    else old_key
+                )
                 new_value = RequestFile._replace(old_value, old=old, new=new)
                 val_out[new_key] = new_value
             return val_out
