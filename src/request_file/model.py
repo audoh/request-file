@@ -124,65 +124,6 @@ class RequestFile(BaseModel):
         with open(path, "r") as fp:
             return cls(**json.load(fp))
 
-    @staticmethod
-    def _str(val: Any) -> str:
-        if val == None:
-            return "null"
-        elif isinstance(val, bool):
-            if val == True:
-                return "true"
-            else:
-                return "false"
-        elif isinstance(val, (int, float, str)):
-            return str(val)
-        raise ValueError(f"unsupported type {type(val)}")
-
-    @staticmethod
-    def _replace(val_in: Any, *, old: str, new: Any) -> Any:
-        if isinstance(val_in, str):
-            if val_in == old:
-                return new
-            else:
-                return val_in.replace(old, RequestFile._str(new))
-        elif isinstance(val_in, Mapping):
-            val_out: Dict[str, Any] = {}
-            for old_key, old_value in val_in.items():
-                new_key = (
-                    old_key.replace(old, RequestFile._str(new))
-                    if isinstance(old_key, str)
-                    else old_key
-                )
-                new_value = RequestFile._replace(old_value, old=old, new=new)
-                val_out[new_key] = new_value
-            return val_out
-        elif isinstance(val_in, Iterable):
-            return [
-                RequestFile._replace(old_value, old=old, new=new)
-                for old_value in val_in
-            ]
-        return val_in
-
-    @staticmethod
-    def replace(model: "RequestFile", old: str, new: Any) -> "RequestFile":
-        url = model.url.replace(old, RequestFile._str(new))
-        method = RequestFile._str(new) if model.method == old else model.method
-        headers = RequestFile._replace(model.headers, old=old, new=new)
-        params = RequestFile._replace(model.params, old=old, new=new)
-        text = RequestFile._replace(model.body_text, old=old, new=new)
-        form_data = RequestFile._replace(model.body_data, old=old, new=new)
-        json = RequestFile._replace(model.body_json, old=old, new=new)
-        return model.copy(
-            update={
-                "url": url,
-                "method": method,
-                "headers": headers,
-                "params": params,
-                "body_text": text,
-                "body_data": form_data,
-                "body_json": json,
-            }
-        )
-
     @property
     def body(self) -> str:
         if self.body_text is not None:
@@ -207,3 +148,57 @@ class RequestFile(BaseModel):
                     body={"petTheCat": True},
                 )
             ]
+
+
+def _str(val: Any) -> str:
+    if val == None:
+        return "null"
+    elif isinstance(val, bool):
+        if val == True:
+            return "true"
+        else:
+            return "false"
+    elif isinstance(val, (int, float, str)):
+        return str(val)
+    raise ValueError(f"unsupported type {type(val)}")
+
+
+def _replace(val_in: Any, *, old: str, new: Any) -> Any:
+    if isinstance(val_in, str):
+        if val_in == old:
+            return new
+        else:
+            return val_in.replace(old, _str(new))
+    elif isinstance(val_in, Mapping):
+        val_out: Dict[str, Any] = {}
+        for old_key, old_value in val_in.items():
+            new_key = (
+                old_key.replace(old, _str(new)) if isinstance(old_key, str) else old_key
+            )
+            new_value = _replace(old_value, old=old, new=new)
+            val_out[new_key] = new_value
+        return val_out
+    elif isinstance(val_in, Iterable):
+        return [_replace(old_value, old=old, new=new) for old_value in val_in]
+    return val_in
+
+
+def replace(model: RequestFile, old: str, new: Any) -> RequestFile:
+    url = model.url.replace(old, _str(new))
+    method = _str(new) if model.method == old else model.method
+    headers = _replace(model.headers, old=old, new=new)
+    params = _replace(model.params, old=old, new=new)
+    text = _replace(model.body_text, old=old, new=new)
+    form_data = _replace(model.body_data, old=old, new=new)
+    json = _replace(model.body_json, old=old, new=new)
+    return model.copy(
+        update={
+            "url": url,
+            "method": method,
+            "headers": headers,
+            "params": params,
+            "body_text": text,
+            "body_data": form_data,
+            "body_json": json,
+        }
+    )

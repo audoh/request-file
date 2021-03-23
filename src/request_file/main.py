@@ -148,6 +148,7 @@ if __name__ == "__main__":
             # Try to use environment var second
             if not is_set:
                 input_replacement = environ.get(f"{env_prefix}{replacement.name}")
+                is_set = input_replacement is not None
             # Use default value third if specified but offer the ability to override it
             default_value = (
                 replacement.default
@@ -187,7 +188,7 @@ if __name__ == "__main__":
             except ValueError as exc:
                 print(f"error: {exc}", file=stderr)
                 exit(1)
-            mdl = model.RequestFile.replace(mdl, old=replacement_key, new=parsed)
+            mdl = model.replace(mdl, old=replacement_key, new=parsed)
 
         qsl = urlparse.parse_qsl(urlparse.urlparse(mdl.url).query)
         for param, param_value in mdl.params.items():
