@@ -136,8 +136,6 @@ if __name__ == "__main__":
     args = _Arguments(**vars(parser.parse_args(argv[1:])))
     replacements = {key: value for key, value in args.replacements}
 
-    print(environ.get("MEOW"))
-
     for export_file in args.files:
         mdl = model.RequestFile.load(export_file)
 
