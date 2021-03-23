@@ -90,17 +90,28 @@ class RequestFile(BaseModel):
             return cls(**json.load(fp))
 
     @staticmethod
+    def _str(val: Any) -> str:
+        if isinstance(val, bool):
+            if val == True:
+                return "true"
+            else:
+                return "false"
+        elif isinstance(val, (int, float, str)):
+            return str(val)
+        raise ValueError(f"unsupported type {type(val)}")
+
+    @staticmethod
     def _replace(val_in: Any, *, old: str, new: Any) -> Any:
         if isinstance(val_in, str):
             if val_in == old:
                 return new
             else:
-                return val_in.replace(old, json.dumps(new))
+                return val_in.replace(old, RequestFile._str(new))
         elif isinstance(val_in, Mapping):
             val_out: Dict[str, Any] = {}
             for old_key, old_value in val_in.items():
                 new_key = (
-                    old_key.replace(old, json.dumps(new))
+                    old_key.replace(old, RequestFile._str(new))
                     if isinstance(old_key, str)
                     else old_key
                 )
