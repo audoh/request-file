@@ -250,7 +250,7 @@ def main(*argv: str) -> None:
                     else input_replacement
                 )
             except ValueError as exc:
-                print(f"error: {exc}", file=stderr)
+                print(f"fatal: {exc}", file=stderr)
                 exit(1)
             mdl = model.replace(mdl, old=replacement_key, new=parsed)
 
