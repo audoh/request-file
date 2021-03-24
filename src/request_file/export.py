@@ -1,6 +1,7 @@
 import json
 from enum import Enum
 from pathlib import Path
+from sys import stderr
 from typing import Any, Dict, Iterable, List, Sequence, Tuple, Union
 
 from requests import Response
@@ -80,7 +81,11 @@ def get_exports(
 ) -> Iterable[Tuple[str, str]]:
     for key, pathspec in mdl.exports.items():
         key = f"{prefix}{key}"
-        value = read_pathspec(text=res.text, pathspec=pathspec)
+        try:
+            value = read_pathspec(text=res.text, pathspec=pathspec)
+        except Exception as exc:
+            print(f"error: failed to read pathspec: {exc}", file=stderr)
+            continue
         yield key, value
 
 
