@@ -274,7 +274,7 @@ def main(*argv: str) -> None:
                 f"-H '{key}: {value}'" for key, value in mdl.headers.items()
             )
 
-            print(f"curl -X {mdl.method} {header_string} -d '{mdl.body}' -L {url}")
+            print(f"curl -X {mdl.method} {header_string} -d '{mdl.body}' -L '{url}'")
 
         if not args.dry_run:
             res = requests.request(
