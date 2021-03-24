@@ -312,5 +312,5 @@ if __name__ == "__main__":
         main(*argv)
     except KeyboardInterrupt:
         print("abort: interrupted", file=stderr)
-    except (KeyboardInterrupt, EOFError) as exc:
+    except EOFError:
         print("abort: eof", file=stderr)
