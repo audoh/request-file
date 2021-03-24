@@ -85,7 +85,7 @@ def get_exports(
             value = read_pathspec(text=res.text, pathspec=pathspec)
         except Exception as exc:
             print(
-                f"get_exports: error: failed to read pathspec for '{key}': {exc}",
+                f"get_exports: {key}: error: failed to read pathspec: {exc}",
                 file=stderr,
             )
             continue
