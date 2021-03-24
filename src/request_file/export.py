@@ -84,7 +84,7 @@ def get_exports(
         try:
             value = read_pathspec(text=res.text, pathspec=pathspec)
         except Exception as exc:
-            print(f"error: failed to read pathspec: {exc}", file=stderr)
+            print(f"get_exports: error: failed to read pathspec: {exc}", file=stderr)
             continue
         yield key, value
 
