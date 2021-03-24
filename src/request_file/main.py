@@ -310,5 +310,7 @@ def main(*argv: str) -> None:
 if __name__ == "__main__":
     try:
         main(*argv)
+    except KeyboardInterrupt:
+        print("abort: interrupted", file=stderr)
     except (KeyboardInterrupt, EOFError) as exc:
-        print(f"abort: {exc}")
+        print("abort: eof", file=stderr)
