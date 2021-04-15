@@ -41,6 +41,7 @@ class _Arguments(argparse.Namespace):
     imports_files: List[str]
     exports_files: List[str]
     output_files: List[str]
+    allow_redirects: bool
     no_prompt: bool
 
 
@@ -180,6 +181,13 @@ def main(*argv: str) -> None:
         action="store_true",
         help="When values are not set in the environment, don't prompt for them. Use the defaults if available, or otherwise skip them entirely.",
     )
+    parser.add_argument(
+        "--ignore-redirects",
+        dest="allow_redirects",
+        default=False,
+        action="store_false",
+        help="Do not automatically resolve redirects.",
+    )
     args = _Arguments(**vars(parser.parse_args(argv[1:])))
     replacements = {key: value for key, value in args.replacements}
 
@@ -278,7 +286,11 @@ def main(*argv: str) -> None:
 
         if not args.dry_run:
             res = requests.request(
-                method=mdl.method, url=url, headers=mdl.headers, data=mdl.body
+                method=mdl.method,
+                url=url,
+                headers=mdl.headers,
+                data=mdl.body,
+                allow_redirects=args.allow_redirects,
             )
 
             # Output response

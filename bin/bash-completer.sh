@@ -58,6 +58,7 @@ _requestfile() {
     opts="$opts --imports -i"
     opts="$opts --exports -e"
     opts="$opts --no-prompt -n"
+    opts="$opts --ignore-redirects"
     opts="$(compgen -W "$opts" -- "$curword")"
   fi
 

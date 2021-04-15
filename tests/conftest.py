@@ -18,6 +18,7 @@ _args = {
     "-e",
     "--no-prompt",
     "-n",
+    "--ignore-redirects"
 }
 
 
