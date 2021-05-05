@@ -27,7 +27,7 @@ _requestfile() {
 
   local curword="${comp_words[comp_cword]}"
   local opts=""
-  if [ "$allow_opt" = true ]; then
+  if [ "$allow_opt" = true ] && [ "${curword:0:1}" = "-" ]; then
     if [ "$comp_cword" -ge 1 ]; then
       local prevword="${comp_words[comp_cword-1]}"
 
