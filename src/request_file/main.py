@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 from dataclasses import dataclass
 from os import environ, makedirs, path
 from sys import argv, stderr
-from typing import Dict, Iterable, List, Tuple
+from typing import Dict, Iterable, List, Sequence, Tuple
 from urllib import parse as urlparse
 
 import requests
@@ -268,11 +268,13 @@ def main(*argv: str) -> None:
                 continue
             elif isinstance(param_value, str):
                 qsl.append((param, param_value))
-            else:
+            elif isinstance(param_value, Sequence):
                 for param_subvalue in param_value:
                     if param_subvalue is None:
                         continue
                     qsl.append((param, param_subvalue))
+            else:
+                qsl.append((param, str(param_value)))
         qs = urlparse.urlencode(qsl)
         url = urlparse.urljoin(mdl.url, f"?{qs}")
 
