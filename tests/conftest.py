@@ -18,11 +18,11 @@ _args = {
     "-e",
     "--no-prompt",
     "-n",
-    "--ignore-redirects"
+    "--ignore-redirects",
 }
 
 
 def args(startswith: str = "") -> Set[str]:
     if not startswith:
-        return _args
+        return set()
     return {arg for arg in _args if arg.startswith(startswith)}

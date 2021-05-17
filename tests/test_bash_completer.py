@@ -114,7 +114,7 @@ class TestOneDir(BaseTestCase):
         tmpdir.mkdir("one")
 
     @BaseTestCase.parametrize(
-        ("", {*args(), "one/"}),
+        ("", {*args(), "one/", BaseTestCase.get_trick_word("one/")}),
         ("-", args("-")),
         ("--", args("--")),
         ("--he", args("--help")),
